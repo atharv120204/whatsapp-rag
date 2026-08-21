@@ -173,9 +173,28 @@ minute or two):
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-You will see a lot of scrolling text. At the end you want a line starting with
-**`Successfully installed`**. A yellow warning about upgrading pip is normal and
-can be ignored.
+A lot of text scrolls past. **Do not ignore it — look at the last few lines.**
+
+- **Good:** a line starting with **`Successfully installed`**. A yellow warning
+  about upgrading pip is fine and can be ignored.
+- **Bad:** anything containing **`ERROR`**, or
+  `Could not open requirements file`.
+
+`Could not open requirements file` means you were in the wrong folder — go back
+and run **4a** first, then this again. When this step fails it installs
+**nothing at all**, and the app then fails later with a confusing
+`No module named 'dotenv'`, which looks like a completely different problem.
+
+**4c-check. Make sure it actually worked.** Paste this:
+
+```powershell
+.\.venv\Scripts\python.exe -c "import dotenv, duckdb, fastapi, uvicorn, pyarrow, pydantic, google.genai; print('ALL PACKAGES OK')"
+```
+
+You want exactly `ALL PACKAGES OK` and nothing else. If you get a red
+`ModuleNotFoundError`, step 4c did not finish — run it again and read its last
+lines this time. Do not continue until this check passes; everything after it
+will fail in a way that does not point back here.
 
 **4d. Install the website parts:**
 
@@ -378,6 +397,24 @@ The engine is not running. Its PowerShell window was closed, or it never
 started. Redo **Step 5, Window 1**, then refresh the browser.
 
 This is by far the most common problem.
+
+### `ModuleNotFoundError: No module named 'dotenv'` (or `duckdb`, or `fastapi`)
+
+Step **4c** did not finish, so none of the app's parts were installed. This is
+the most misleading failure in the whole setup: it surfaces much later, when you
+try to start the engine, and looks nothing like an install problem.
+
+Run the check in **4c-check**. If it fails, run **4a** and then **4c** again,
+and this time read the last few lines of output — the reason will be there,
+usually `Could not open requirements file` (wrong folder) or a network error.
+
+If you put the project somewhere other than `C:\whatsapp-rag`, use your own path
+in both commands. The safest version, which works from any folder — replace
+`YOUR_PATH` with wherever your `whatsapp-rag` folder actually is:
+
+```powershell
+YOUR_PATH\backend\.venv\Scripts\python.exe -m pip install -r YOUR_PATH\backend\requirements.txt
+```
 
 ### `... is not recognized as the name of a cmdlet`
 
