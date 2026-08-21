@@ -101,6 +101,11 @@ conversations would quietly ruin every statistic.
 
 ## Setup
 
+> **New to this, or setting it up on a fresh machine?** [SETUP.md](SETUP.md) is a
+> click-by-click walkthrough that assumes no programming knowledge — installing
+> Python and Node, getting the two free API keys, exporting your chat from the
+> phone, and what to do when something goes wrong. The short version follows.
+
 ```bash
 cd whatsapp-rag/backend
 py -m venv .venv
