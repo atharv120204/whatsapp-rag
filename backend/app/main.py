@@ -286,9 +286,16 @@ def _run_ingest(path: Path, archive: Archive, mode: str,
             state["result"] = result.as_dict()
             state["error"] = None if result.ok else "; ".join(result.errors)
     except Exception as exc:  # noqa: BLE001 - surfaced to the UI
-        traceback.print_exc()
+        # Keep the traceback, not just the message. A job that failed with a
+        # bare "tuple index out of range" cost a whole debugging session and
+        # was never diagnosed, because the only copy went to a console
+        # nobody was watching and had scrolled away by the time it mattered.
+        detail = traceback.format_exc()
+        print(detail)
         with _ingest_lock:
-            _ingest_state.setdefault(archive.archive_id, {})["error"] = str(exc)
+            state = _ingest_state.setdefault(archive.archive_id, {})
+            state["error"] = str(exc)
+            state["traceback"] = detail
     finally:
         with _ingest_lock:
             state = _ingest_state.setdefault(archive.archive_id, {})
@@ -467,9 +474,16 @@ def _run_maintenance(archive: Archive, task: str, kinds: list[str] | None) -> No
             job["notice"] = summary.get("quota_message") or None
             job["error"] = None
     except Exception as exc:  # noqa: BLE001 - surfaced to the UI
-        traceback.print_exc()
+        # Keep the traceback, not just the message. A job that failed with a
+        # bare "tuple index out of range" cost a whole debugging session and
+        # was never diagnosed, because the only copy went to a console
+        # nobody was watching and had scrolled away by the time it mattered.
+        detail = traceback.format_exc()
+        print(detail)
         with _ingest_lock:
-            _ingest_state.setdefault(archive.archive_id, {})["error"] = str(exc)
+            state = _ingest_state.setdefault(archive.archive_id, {})
+            state["error"] = str(exc)
+            state["traceback"] = detail
     finally:
         with _ingest_lock:
             job = _ingest_state.setdefault(archive.archive_id, {})
