@@ -88,6 +88,7 @@ export default function PendingWork({ archive, onCompleted }: Props) {
   /** Ran out of budget: the designed ending, not a failure. */
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [trace, setTrace] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
   const pollRef = useRef<number | null>(null);
 
@@ -134,6 +135,7 @@ export default function PendingWork({ archive, onCompleted }: Props) {
             setFinished(state.result?.summary?.message ?? "Finished.");
             setNotice(state.notice ?? null);
             setError(state.error ?? null);
+            setTrace(state.traceback ?? null);
             load();
             onCompleted();
           }
@@ -149,6 +151,7 @@ export default function PendingWork({ archive, onCompleted }: Props) {
 
   async function start(task: MaintenanceTask) {
     setError(null);
+    setTrace(null);
     setNotice(null);
     setFinished(null);
     setConfirming(null);
@@ -223,6 +226,30 @@ export default function PendingWork({ archive, onCompleted }: Props) {
       {error && (
         <div className="error-box" style={{ marginTop: 12 }}>
           {error}
+          {/*
+            Collapsed, because a stack trace is not what most failures need —
+            but available, because one job failed with a bare "tuple index out
+            of range" and the only copy of the traceback went to a terminal
+            nobody was watching. Copyable beats reproducible.
+          */}
+          {trace && (
+            <details style={{ marginTop: 8 }}>
+              <summary style={{ cursor: "pointer", fontSize: 12.5 }}>
+                Show details
+              </summary>
+              <pre
+                style={{
+                  fontSize: 11.5,
+                  overflowX: "auto",
+                  whiteSpace: "pre-wrap",
+                  marginTop: 8,
+                  fontFamily: "var(--mono)",
+                }}
+              >
+                {trace}
+              </pre>
+            </details>
+          )}
         </div>
       )}
 
