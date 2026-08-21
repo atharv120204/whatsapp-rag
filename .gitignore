@@ -1,0 +1,18 @@
+# Never commit chat data or API keys. This is the whole point.
+data/
+*.duckdb
+*.duckdb.wal
+*.duckdb.tmp/
+
+.env
+.venv/
+__pycache__/
+*.pyc
+
+node_modules/
+dist/
+.DS_Store
+tsconfig.tsbuildinfo
+
+# Private working notes about the local archive — never published.
+HANDOFF.md
